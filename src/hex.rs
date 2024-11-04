@@ -20,6 +20,14 @@ impl Hex {
         Hex { q, r, s: -q - r }
     }
 
+    pub fn neighbor(&self, dir: Dir) -> Hex {
+        *self + Dir::CUBE_DIR[dir.to_usize()]
+    }
+
+    pub fn neighbor_from_index(&self, index: usize) -> Hex {
+        *self + Dir::CUBE_DIR[index]
+    }
+
     pub fn ring(&self, radius: i32) -> Vec<Hex> {
         let mut results = Vec::new();
         let mut h = *self + Dir::CUBE_DIR[4] * radius;
@@ -29,6 +37,21 @@ impl Hex {
                 results.push(h);
                 h += Dir::CUBE_DIR[i];
             }
+        }
+
+        if radius == 0 {
+            results.push(*self);
+        }
+
+        results
+    }
+
+    pub fn spiral(&self, radius: i32) -> Vec<Hex> {
+        let mut results = Vec::new();
+        results.push(*self);
+
+        for r in 1..=radius {
+            results.extend(self.ring(r));
         }
 
         results
@@ -129,33 +152,33 @@ impl Layout {
 
 pub enum Dir {
     East,
-    NorthEast,
-    NorthWest,
-    West,
-    SouthWest,
     SouthEast,
+    SouthWest,
+    West,
+    NorthWest,
+    NorthEast,
 }
 
 impl Dir {
     pub const CUBE_DIR: [Hex; 6] = [
         Hex { q: 1, r: 0, s: -1 },
-        Hex { q: 0, r: 1, s: -1 },
-        Hex { q: -1, r: 1, s: 0 },
-        Hex { q: -1, r: 0, s: 1 },
-        Hex { q: 0, r: -1, s: 1 },
         Hex { q: 1, r: -1, s: 0 },
+        Hex { q: 0, r: -1, s: 1 },
+        Hex { q: -1, r: 0, s: 1 },
+        Hex { q: -1, r: 1, s: 0 },
+        Hex { q: 0, r: 1, s: -1 },
     ];
 
     pub const AXIAL_DIR: [Hex; 6] = [
         Hex::from_axial(1, 0),
-        Hex::from_axial(0, 1),
-        Hex::from_axial(-1, 1),
-        Hex::from_axial(-1, 0),
-        Hex::from_axial(0, -1),
         Hex::from_axial(1, -1),
+        Hex::from_axial(0, -1),
+        Hex::from_axial(-1, 0),
+        Hex::from_axial(-1, 1),
+        Hex::from_axial(0, 1),
     ];
 
-    pub fn from_int(n: usize) -> Self {
+    pub fn from_usize(n: usize) -> Self {
         assert!(0 < n && n < 6);
 
         match n {
@@ -169,7 +192,7 @@ impl Dir {
         }
     }
 
-    pub fn to_int(self) -> i32 {
+    pub fn to_usize(self) -> usize {
         match self {
             Dir::East => 0,
             Dir::SouthEast => 1,
