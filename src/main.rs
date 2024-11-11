@@ -1,12 +1,67 @@
-use std::{collections::HashMap, io::repeat};
+use std::collections::HashMap;
 
 use macroquad::prelude::*;
 
 mod hex;
-
 use hex::*;
 
-#[macroquad::main("Super Evil Cats Running Elaborate Trapping Schemes")]
+#[derive(Debug, Clone)]
+enum PlayerState {
+    Standing(Hex),
+    Flat(Hex, Hex),
+}
+
+struct Player {
+    state: PlayerState,
+}
+
+impl Player {
+    fn draw(&self, layout: &Layout) {
+        match self.state {
+            PlayerState::Standing(hex) => {
+                let pixel = layout.hex_to_pixel(hex);
+                draw_circle(pixel.x as f32, pixel.y as f32, 25.0, BLUE);
+            }
+            PlayerState::Flat(head, tail) => {
+                let head_pixel = layout.hex_to_pixel(head);
+                let tail_pixel = layout.hex_to_pixel(tail);
+                draw_circle(head_pixel.x as f32, head_pixel.y as f32, 25.0, BLUE);
+                draw_circle(tail_pixel.x as f32, tail_pixel.y as f32, 25.0, YELLOW);
+            }
+        }
+    }
+
+    fn move_player(&mut self, direction: HexDirection) {
+        let delta = direction.to_hex();
+        if delta == Hex::from_axial(0, 0) {
+            return;
+        }
+
+        self.state = match self.state {
+            PlayerState::Standing(head) => PlayerState::Flat(head + delta * 2, head + delta),
+            PlayerState::Flat(head, tail) => {
+                let diff = HexDirection::get_dir_from_to(tail, head);
+
+                if diff == direction {
+                    PlayerState::Standing(head + delta)
+                } else if diff == direction.opposite() {
+                    PlayerState::Standing(tail + delta)
+                } else {
+                    PlayerState::Flat(head + delta, tail + delta)
+                }
+            }
+        }
+    }
+}
+
+fn window_conf() -> Conf {
+    Conf {
+        window_title: "My Game".to_owned(),
+        ..Default::default()
+    }
+}
+
+#[macroquad::main(window_conf)]
 async fn main() {
     let pointy: Layout = Layout {
         orientation: Orientation::LAYOUT_POINTY,
@@ -18,23 +73,16 @@ async fn main() {
     };
 
     let mut hexmap = HashMap::new();
+    let mut player_hex = Hex::from_cube(0, 0, 0);
 
-    let radius = 4;
-    for r in 0..radius {
-        let mut h = Hex::from_cube(0, -r, r);
-        hexmap.insert(h, 1);
-
-        for dir in 0..6 {
-            let num_of_hexas_in_edge = if dir == 5 { r - 1 } else { r };
-
-            for _ in 0..num_of_hexas_in_edge {
-                h += Dir::CUBE_DIR[dir];
-                hexmap.insert(h, 1);
-            }
-        }
+    hexmap.insert(player_hex, 1);
+    for hex in player_hex.spiral(3) {
+        hexmap.insert(hex, 1);
     }
 
-    let mut player_hex = Hex::from_cube(0, 0, 0);
+    let mut main_character = Player {
+        state: PlayerState::Standing(player_hex),
+    };
 
     loop {
         clear_background(WHITE);
@@ -44,16 +92,23 @@ async fn main() {
             draw_hexagon(pixel.x as f32, pixel.y as f32, 50.0, 1.0, true, RED, WHITE);
         }
 
-        let player_pixel = pointy.hex_to_pixel(player_hex);
-        draw_hexagon(
-            player_pixel.x as f32,
-            player_pixel.y as f32,
-            25.0,
-            1.0,
-            true,
-            GREEN,
-            GREEN,
-        );
+        if let Some(key) = get_last_key_pressed() {
+            let dir: Option<HexDirection> = match key {
+                KeyCode::W => Some(HexDirection::NW),
+                KeyCode::E => Some(HexDirection::NE),
+                KeyCode::D => Some(HexDirection::E),
+                KeyCode::A => Some(HexDirection::W),
+                KeyCode::Z => Some(HexDirection::SW),
+                KeyCode::X => Some(HexDirection::SE),
+                _ => None,
+            };
+
+            if let Some(dir) = dir {
+                main_character.move_player(dir);
+            }
+        }
+
+        main_character.draw(&pointy);
 
         next_frame().await
     }
