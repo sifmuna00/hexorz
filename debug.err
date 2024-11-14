@@ -1,0 +1,266 @@
+   Compiling secrets v0.1.0 (/home/sifmunix/projects/game_jams/game_off/secrets)
+warning: unused import: `color::Color`
+ --> src/core/hex.rs:1:17
+  |
+1 | use macroquad::{color::Color, math::*};
+  |                 ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused imports: `hash::Hash` and `vec`
+ --> src/core/map.rs:2:33
+  |
+2 | use std::{collections::HashMap, hash::Hash, vec};
+  |                                 ^^^^^^^^^^  ^^^
+
+warning: unused import: `std::collections::HashMap`
+ --> src/core/player.rs:1:5
+  |
+1 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `self`
+ --> src/main.rs:8:11
+  |
+8 |     hex::{self, *},
+  |           ^^^^
+
+warning: variable does not need to be mutable
+   --> src/main.rs:161:9
+    |
+161 |     let mut hexmap = tmp.hexmap.clone();
+    |         ----^^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: unused variable: `size`
+   --> src/core/hex.rs:184:13
+    |
+184 |         let size = self.size;
+    |             ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `origin`
+   --> src/core/hex.rs:185:13
+    |
+185 |         let origin = self.origin;
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_origin`
+
+warning: method `draw_hexes` is never used
+   --> src/main.rs:119:8
+    |
+28  | impl Game {
+    | --------- method in this implementation
+...
+119 |     fn draw_hexes(&self, texture: &Texture2D) {
+    |        ^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: associated items `from_cube`, `neighbor_from_index`, `ring`, and `spiral` are never used
+  --> src/core/hex.rs:14:12
+   |
+13 | impl Hex {
+   | -------- associated items in this implementation
+14 |     pub fn from_cube(q: i32, r: i32, s: i32) -> Self {
+   |            ^^^^^^^^^
+...
+27 |     pub fn neighbor_from_index(&self, index: usize) -> Hex {
+   |            ^^^^^^^^^^^^^^^^^^^
+...
+31 |     pub fn ring(&self, radius: i32) -> Vec<Hex> {
+   |            ^^^^
+...
+49 |     pub fn spiral(&self, radius: i32) -> Vec<Hex> {
+   |            ^^^^^^
+
+warning: methods `length` and `distance` are never used
+   --> src/core/hex.rs:116:12
+    |
+115 | impl Hex {
+    | -------- methods in this implementation
+116 |     pub fn length(&self) -> i32 {
+    |            ^^^^^^
+...
+120 |     pub fn distance(self, _rhs: Hex) -> i32 {
+    |            ^^^^^^^^
+
+warning: struct `FractionalHex` is never constructed
+   --> src/core/hex.rs:125:12
+    |
+125 | pub struct FractionalHex {
+    |            ^^^^^^^^^^^^^
+
+warning: method `round` is never used
+   --> src/core/hex.rs:132:12
+    |
+131 | impl FractionalHex {
+    | ------------------ method in this implementation
+132 |     pub fn round(&self) -> Hex {
+    |            ^^^^^
+
+warning: fields `f_inv` and `start_angle` are never read
+   --> src/core/hex.rs:154:9
+    |
+152 | pub struct Orientation {
+    |            ----------- fields in this struct
+153 |     pub f: Mat2,
+154 |     pub f_inv: Mat2,
+    |         ^^^^^
+155 |     pub start_angle: f64,
+    |         ^^^^^^^^^^^
+    |
+    = note: `Orientation` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: methods `pixel_to_iso` and `pixel_to_hex` are never used
+   --> src/core/hex.rs:182:12
+    |
+173 | impl Layout {
+    | ----------- methods in this implementation
+...
+182 |     pub fn pixel_to_iso(&self, p: Vec2, offset: Vec2) -> Vec2 {
+    |            ^^^^^^^^^^^^
+...
+190 |     pub fn pixel_to_hex(&self, p: Vec2) -> FractionalHex {
+    |            ^^^^^^^^^^^^
+
+warning: `secrets` (bin "secrets") generated 14 warnings (run `cargo fix --bin "secrets"` to apply 5 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.99s
+     Running `target/x86_64-pc-windows-gnu/debug/secrets.exe`
+Standing(Hex { q: 4, r: 1, s: -5 })
+Flat(Hex { q: 6, r: 1, s: -7 }, Hex { q: 5, r: 1, s: -6 })
+Flat(Hex { q: 4, r: 3, s: -7 }, Hex { q: 4, r: 2, s: -6 })
+Flat(Hex { q: 2, r: 3, s: -5 }, Hex { q: 3, r: 2, s: -5 })
+Flat(Hex { q: 2, r: 1, s: -3 }, Hex { q: 3, r: 1, s: -4 })
+Flat(Hex { q: 4, r: -1, s: -3 }, Hex { q: 4, r: 0, s: -4 })
+Flat(Hex { q: 6, r: -1, s: -5 }, Hex { q: 5, r: 0, s: -5 })
+Flat(Hex { q: 4, r: 1, s: -5 }, Hex { q: 5, r: 1, s: -6 })
+Standing(Hex { q: 6, r: 1, s: -7 })
+Flat(Hex { q: 4, r: 2, s: -6 }, Hex { q: 5, r: 2, s: -7 })
+Flat(Hex { q: 3, r: 2, s: -5 }, Hex { q: 4, r: 2, s: -6 })
+Standing(Hex { q: 3, r: 1, s: -4 })
+Flat(Hex { q: 4, r: 0, s: -4 }, Hex { q: 5, r: 0, s: -5 })
+Flat(Hex { q: 5, r: 0, s: -5 }, Hex { q: 6, r: 0, s: -6 })
+Flat(Hex { q: 4, r: 1, s: -5 }, Hex { q: 4, r: 2, s: -6 })
+Flat(Hex { q: 5, r: 1, s: -6 }, Hex { q: 5, r: 2, s: -7 })
+Standing(Hex { q: 4, r: 3, s: -7 })
+Flat(Hex { q: 3, r: 2, s: -5 }, Hex { q: 3, r: 3, s: -6 })
+Flat(Hex { q: 3, r: 1, s: -4 }, Hex { q: 3, r: 2, s: -5 })
+Standing(Hex { q: 4, r: 0, s: -4 })
+Flat(Hex { q: 5, r: 0, s: -5 }, Hex { q: 5, r: 1, s: -6 })
+Flat(Hex { q: 4, r: 1, s: -5 }, Hex { q: 3, r: 2, s: -5 })
+Flat(Hex { q: 5, r: 1, s: -6 }, Hex { q: 4, r: 2, s: -6 })
+Flat(Hex { q: 4, r: 2, s: -6 }, Hex { q: 3, r: 3, s: -6 })
+Standing(Hex { q: 2, r: 3, s: -5 })
+Flat(Hex { q: 3, r: 1, s: -4 }, Hex { q: 2, r: 2, s: -4 })
+Flat(Hex { q: 4, r: 0, s: -4 }, Hex { q: 3, r: 1, s: -4 })
+Standing(Hex { q: 5, r: 0, s: -5 })
+Flat(Hex { q: 4, r: 1, s: -5 }, Hex { q: 3, r: 1, s: -4 })
+Standing(Hex { q: 5, r: 1, s: -6 })
+Flat(Hex { q: 4, r: 2, s: -6 }, Hex { q: 3, r: 2, s: -5 })
+Flat(Hex { q: 3, r: 2, s: -5 }, Hex { q: 2, r: 2, s: -4 })
+Standing(Hex { q: 2, r: 1, s: -3 })
+Flat(Hex { q: 4, r: 0, s: -4 }, Hex { q: 3, r: 0, s: -3 })
+Flat(Hex { q: 5, r: 0, s: -5 }, Hex { q: 4, r: 0, s: -4 })
+Flat(Hex { q: 4, r: 1, s: -5 }, Hex { q: 4, r: 0, s: -4 })
+Flat(Hex { q: 5, r: 1, s: -6 }, Hex { q: 5, r: 0, s: -5 })
+Standing(Hex { q: 4, r: 2, s: -6 })
+Flat(Hex { q: 3, r: 2, s: -5 }, Hex { q: 3, r: 1, s: -4 })
+Flat(Hex { q: 3, r: 1, s: -4 }, Hex { q: 3, r: 0, s: -3 })
+Standing(Hex { q: 4, r: -1, s: -3 })
+Flat(Hex { q: 5, r: 0, s: -5 }, Hex { q: 5, r: -1, s: -4 })
+Flat(Hex { q: 4, r: 1, s: -5 }, Hex { q: 5, r: 0, s: -5 })
+Flat(Hex { q: 5, r: 1, s: -6 }, Hex { q: 6, r: 0, s: -6 })
+Flat(Hex { q: 4, r: 2, s: -6 }, Hex { q: 5, r: 1, s: -6 })
+Standing(Hex { q: 3, r: 2, s: -5 })
+Flat(Hex { q: 3, r: 1, s: -4 }, Hex { q: 4, r: 0, s: -4 })
+Flat(Hex { q: 4, r: 0, s: -4 }, Hex { q: 5, r: -1, s: -4 })
+Standing(Hex { q: 6, r: -1, s: -5 })
+Flat(Hex { q: 2, r: 3, s: -5 }, Hex { q: 2, r: 2, s: -4 })
+Flat(Hex { q: 0, r: 3, s: -3 }, Hex { q: 1, r: 2, s: -3 })
+Flat(Hex { q: 0, r: 1, s: -1 }, Hex { q: 1, r: 1, s: -2 })
+Flat(Hex { q: 2, r: -1, s: -1 }, Hex { q: 2, r: 0, s: -2 })
+Flat(Hex { q: 4, r: -1, s: -3 }, Hex { q: 3, r: 0, s: -3 })
+Flat(Hex { q: 2, r: 2, s: -4 }, Hex { q: 3, r: 2, s: -5 })
+Flat(Hex { q: 1, r: 2, s: -3 }, Hex { q: 2, r: 2, s: -4 })
+Standing(Hex { q: 1, r: 1, s: -2 })
+Flat(Hex { q: 2, r: 0, s: -2 }, Hex { q: 3, r: 0, s: -3 })
+Flat(Hex { q: 3, r: 0, s: -3 }, Hex { q: 4, r: 0, s: -4 })
+Flat(Hex { q: 2, r: 1, s: -3 }, Hex { q: 2, r: 2, s: -4 })
+Flat(Hex { q: 1, r: 2, s: -3 }, Hex { q: 1, r: 3, s: -4 })
+Flat(Hex { q: 1, r: 1, s: -2 }, Hex { q: 1, r: 2, s: -3 })
+Standing(Hex { q: 2, r: 0, s: -2 })
+Flat(Hex { q: 3, r: 0, s: -3 }, Hex { q: 3, r: 1, s: -4 })
+Flat(Hex { q: 2, r: 1, s: -3 }, Hex { q: 1, r: 2, s: -3 })
+Flat(Hex { q: 2, r: 2, s: -4 }, Hex { q: 1, r: 3, s: -4 })
+Standing(Hex { q: 0, r: 3, s: -3 })
+Flat(Hex { q: 1, r: 1, s: -2 }, Hex { q: 0, r: 2, s: -2 })
+Flat(Hex { q: 2, r: 0, s: -2 }, Hex { q: 1, r: 1, s: -2 })
+Standing(Hex { q: 3, r: 0, s: -3 })
+Flat(Hex { q: 2, r: 1, s: -3 }, Hex { q: 1, r: 1, s: -2 })
+Flat(Hex { q: 2, r: 2, s: -4 }, Hex { q: 1, r: 2, s: -3 })
+Flat(Hex { q: 1, r: 2, s: -3 }, Hex { q: 0, r: 2, s: -2 })
+Standing(Hex { q: 0, r: 1, s: -1 })
+Flat(Hex { q: 2, r: 0, s: -2 }, Hex { q: 1, r: 0, s: -1 })
+Flat(Hex { q: 3, r: 0, s: -3 }, Hex { q: 2, r: 0, s: -2 })
+Flat(Hex { q: 2, r: 1, s: -3 }, Hex { q: 2, r: 0, s: -2 })
+Standing(Hex { q: 2, r: 2, s: -4 })
+Flat(Hex { q: 1, r: 2, s: -3 }, Hex { q: 1, r: 1, s: -2 })
+Flat(Hex { q: 1, r: 1, s: -2 }, Hex { q: 1, r: 0, s: -1 })
+Standing(Hex { q: 2, r: -1, s: -1 })
+Flat(Hex { q: 3, r: 0, s: -3 }, Hex { q: 3, r: -1, s: -2 })
+Flat(Hex { q: 2, r: 1, s: -3 }, Hex { q: 3, r: 0, s: -3 })
+Flat(Hex { q: 2, r: 2, s: -4 }, Hex { q: 3, r: 1, s: -4 })
+Standing(Hex { q: 1, r: 2, s: -3 })
+Flat(Hex { q: 1, r: 1, s: -2 }, Hex { q: 2, r: 0, s: -2 })
+Flat(Hex { q: 2, r: 0, s: -2 }, Hex { q: 3, r: -1, s: -2 })
+Flat(Hex { q: 5, r: 1, s: -6 }, Hex { q: 4, r: 1, s: -5 })
+Flat(Hex { q: 3, r: 3, s: -6 }, Hex { q: 3, r: 2, s: -5 })
+Flat(Hex { q: 1, r: 3, s: -4 }, Hex { q: 2, r: 2, s: -4 })
+Flat(Hex { q: 1, r: 1, s: -2 }, Hex { q: 2, r: 1, s: -3 })
+Flat(Hex { q: 3, r: -1, s: -2 }, Hex { q: 3, r: 0, s: -3 })
+Flat(Hex { q: 5, r: -1, s: -4 }, Hex { q: 4, r: 0, s: -4 })
+Flat(Hex { q: 3, r: 1, s: -4 }, Hex { q: 4, r: 1, s: -5 })
+Standing(Hex { q: 3, r: 3, s: -6 })
+Flat(Hex { q: 2, r: 2, s: -4 }, Hex { q: 2, r: 3, s: -5 })
+Flat(Hex { q: 4, r: 0, s: -4 }, Hex { q: 4, r: 1, s: -5 })
+Flat(Hex { q: 3, r: 2, s: -5 }, Hex { q: 2, r: 3, s: -5 })
+Standing(Hex { q: 1, r: 3, s: -4 })
+Flat(Hex { q: 3, r: 0, s: -3 }, Hex { q: 2, r: 1, s: -3 })
+Flat(Hex { q: 3, r: 1, s: -4 }, Hex { q: 2, r: 1, s: -3 })
+Flat(Hex { q: 2, r: 2, s: -4 }, Hex { q: 2, r: 1, s: -3 })
+Standing(Hex { q: 3, r: -1, s: -2 })
+Flat(Hex { q: 4, r: 0, s: -4 }, Hex { q: 4, r: -1, s: -3 })
+Flat(Hex { q: 3, r: 2, s: -5 }, Hex { q: 4, r: 1, s: -5 })
+Flat(Hex { q: 3, r: 0, s: -3 }, Hex { q: 4, r: -1, s: -3 })
+Standing(Hex { q: 5, r: -1, s: -4 })
+Flat(Hex { q: 1, r: 3, s: -4 }, Hex { q: 1, r: 2, s: -3 })
+Flat(Hex { q: -1, r: 3, s: -2 }, Hex { q: 0, r: 2, s: -2 })
+Flat(Hex { q: -1, r: 1, s: 0 }, Hex { q: 0, r: 1, s: -1 })
+Flat(Hex { q: 1, r: -1, s: 0 }, Hex { q: 1, r: 0, s: -1 })
+Flat(Hex { q: 3, r: -1, s: -2 }, Hex { q: 2, r: 0, s: -2 })
+Flat(Hex { q: 0, r: 2, s: -2 }, Hex { q: 1, r: 2, s: -3 })
+Flat(Hex { q: 1, r: 0, s: -1 }, Hex { q: 2, r: 0, s: -2 })
+Flat(Hex { q: 0, r: 2, s: -2 }, Hex { q: 0, r: 3, s: -3 })
+Flat(Hex { q: 0, r: 1, s: -1 }, Hex { q: 0, r: 2, s: -2 })
+Standing(Hex { q: 1, r: 0, s: -1 })
+Flat(Hex { q: 2, r: 0, s: -2 }, Hex { q: 2, r: 1, s: -3 })
+Flat(Hex { q: 1, r: 2, s: -3 }, Hex { q: 0, r: 3, s: -3 })
+Standing(Hex { q: -1, r: 3, s: -2 })
+Flat(Hex { q: 0, r: 1, s: -1 }, Hex { q: -1, r: 2, s: -1 })
+Flat(Hex { q: 1, r: 0, s: -1 }, Hex { q: 0, r: 1, s: -1 })
+Flat(Hex { q: 1, r: 1, s: -2 }, Hex { q: 0, r: 1, s: -1 })
+Flat(Hex { q: 0, r: 2, s: -2 }, Hex { q: -1, r: 2, s: -1 })
+Standing(Hex { q: -1, r: 1, s: 0 })
+Flat(Hex { q: 1, r: 0, s: -1 }, Hex { q: 0, r: 0, s: 0 })
+Flat(Hex { q: 0, r: 2, s: -2 }, Hex { q: 0, r: 1, s: -1 })
+Flat(Hex { q: 0, r: 1, s: -1 }, Hex { q: 0, r: 0, s: 0 })
+Standing(Hex { q: 1, r: -1, s: 0 })
+Flat(Hex { q: 2, r: 0, s: -2 }, Hex { q: 2, r: -1, s: -1 })
+Flat(Hex { q: 1, r: 2, s: -3 }, Hex { q: 2, r: 1, s: -3 })
+Standing(Hex { q: 0, r: 2, s: -2 })
+Flat(Hex { q: 0, r: 1, s: -1 }, Hex { q: 1, r: 0, s: -1 })
+Flat(Hex { q: 1, r: 0, s: -1 }, Hex { q: 2, r: -1, s: -1 })

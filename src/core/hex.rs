@@ -21,21 +21,21 @@ impl Hex {
     }
 
     pub fn neighbor(&self, dir: HexDirection) -> Hex {
-        *self + HexDirection::DIR[dir.to_usize()]
+        *self + DIR[dir.to_usize()]
     }
 
     pub fn neighbor_from_index(&self, index: usize) -> Hex {
-        *self + HexDirection::DIR[index]
+        *self + DIR[index]
     }
 
     pub fn ring(&self, radius: i32) -> Vec<Hex> {
         let mut results = Vec::new();
-        let mut h = *self + HexDirection::DIR[4] * radius;
+        let mut h = *self + DIR[4] * radius;
 
         for i in 0..6 {
             for _ in 0..radius {
                 results.push(h);
-                h += HexDirection::DIR[i];
+                h += DIR[i];
             }
         }
 
@@ -157,8 +157,8 @@ pub struct Orientation {
 
 impl Orientation {
     pub const LAYOUT_POINTY: Orientation = Orientation {
-        f: mat2(vec2(SQRT_3, 0.0), vec2(SQRT_3 / 2.0, 3.0 / 2.0)),
-        f_inv: mat2(vec2(SQRT_3 / 3.0, 0.0), vec2(-1.0 / 3.0, 2.0 / 3.0)),
+        f: Mat2::from_cols_array(&[SQRT_3, 0.0, SQRT_3 / 2.0, 3.0 / 2.0]),
+        f_inv: Mat2::from_cols_array(&[SQRT_3 / 3.0, 0.0, -1.0 / 3.0, 2.0 / 3.0]),
         start_angle: 0.5 * std::f64::consts::PI,
     };
 }
@@ -179,6 +179,14 @@ impl Layout {
         mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin
     }
 
+    pub fn pixel_to_iso(&self, p: Vec2, offset: Vec2) -> Vec2 {
+        let mat = Mat2::from_cols_array(&[0.5, 0.25, -0.5, 0.25]);
+        let size = self.size;
+        let origin = self.origin;
+
+        mat * p + offset
+    }
+
     pub fn pixel_to_hex(&self, p: Vec2) -> FractionalHex {
         let mat = &self.orientation;
         let size = self.size;
@@ -192,11 +200,6 @@ impl Layout {
             s: -pt.x - pt.y,
         }
     }
-
-    pub fn draw_circle(&self, hex: Hex, color: Color) {
-        let pixel = self.hex_to_pixel(hex);
-        macroquad::prelude::draw_circle(pixel.x as f32, pixel.y as f32, 25.0, color);
-    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -209,16 +212,25 @@ pub enum HexDirection {
     NE,
 }
 
-impl HexDirection {
-    pub const DIR: [Hex; 6] = [
-        Hex::from_axial(1, 0),
-        Hex::from_axial(1, -1),
-        Hex::from_axial(0, -1),
-        Hex::from_axial(-1, 0),
-        Hex::from_axial(-1, 1),
-        Hex::from_axial(0, 1),
-    ];
+pub const DIR: [Hex; 6] = [
+    Hex::from_axial(1, 0),
+    Hex::from_axial(1, -1),
+    Hex::from_axial(0, -1),
+    Hex::from_axial(-1, 0),
+    Hex::from_axial(-1, 1),
+    Hex::from_axial(0, 1),
+];
 
+pub const HEX_DIRECTIONS: [HexDirection; 6] = [
+    HexDirection::E,
+    HexDirection::SE,
+    HexDirection::SW,
+    HexDirection::W,
+    HexDirection::NW,
+    HexDirection::NE,
+];
+
+impl HexDirection {
     pub fn from_usize(n: usize) -> Self {
         assert!(n < 6);
 
@@ -245,13 +257,13 @@ impl HexDirection {
     }
 
     pub fn to_hex(self) -> Hex {
-        HexDirection::DIR[self.to_usize()]
+        DIR[self.to_usize()]
     }
 
     pub fn get_dir_from_to(from: Hex, to: Hex) -> Self {
         let diff = to - from;
         for dir in 0..6 {
-            if diff == HexDirection::DIR[dir] {
+            if diff == DIR[dir] {
                 return HexDirection::from_usize(dir);
             }
         }
