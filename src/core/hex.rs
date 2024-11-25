@@ -1,7 +1,7 @@
 use macroquad::{color::Color, math::*};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
-const SQRT_3: f32 = 1.732050807568877293527446341505872367_f32;
+pub const SQRT_3: f32 = 1.732050807568877293527446341505872367_f32;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Hex {
@@ -176,7 +176,8 @@ impl Layout {
         let size = self.size;
         let origin = self.origin;
 
-        mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin
+        let res = mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin;
+        res
     }
 
     pub fn pixel_to_iso(&self, p: Vec2, offset: Vec2) -> Vec2 {
@@ -184,7 +185,7 @@ impl Layout {
         let size = self.size;
         let origin = self.origin;
 
-        mat * p + offset
+        mat * p
     }
 
     pub fn pixel_to_hex(&self, p: Vec2) -> FractionalHex {

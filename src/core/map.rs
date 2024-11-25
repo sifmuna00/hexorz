@@ -1,5 +1,4 @@
-use std::collections::HashSet;
-use std::{collections::HashMap, hash::Hash, vec};
+use std::collections::HashMap;
 
 use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
@@ -15,7 +14,7 @@ pub struct HexMap {
 }
 
 impl HexMap {
-    pub fn solve_path(&self) {
+    pub fn solve_path(&self) -> Option<Vec<PlayerState>> {
         let mut g = Graph::new();
 
         let mut start = NodeIndex::default();
@@ -44,7 +43,10 @@ impl HexMap {
                     goal = icur;
                 }
 
-                let next = cur.next_state(dir);
+                let next = cur.next_state_in_map(dir, &self.hexmap);
+                if next == PlayerState::Dead {
+                    continue;
+                }
 
                 let inext = if !idx.contains_key(&next) {
                     let i = g.add_node(next);
@@ -61,6 +63,10 @@ impl HexMap {
             for dir in HEX_DIRECTIONS {
                 let tail = head.neighbor(dir);
 
+                if !self.hexmap.contains_key(&tail) {
+                    continue;
+                }
+
                 let cur = PlayerState::Flat(*head, tail);
 
                 let icur = if !idx.contains_key(&cur) {
@@ -72,7 +78,10 @@ impl HexMap {
                 };
 
                 for dir2 in HEX_DIRECTIONS {
-                    let next = cur.next_state(dir2);
+                    let next = cur.next_state_in_map(dir2, &self.hexmap);
+                    if next == PlayerState::Dead {
+                        continue;
+                    }
 
                     let inext = if !idx.contains_key(&next) {
                         let i = g.add_node(next);
@@ -89,25 +98,29 @@ impl HexMap {
 
         let path = astar(&g, start, |finish| finish == goal, |e| *e.weight(), |_| 0);
 
-        println!("Path: {:?}", path);
+        match path {
+            Some((_, d)) => {
+                let mut d = d.clone();
+                let mut v = vec![];
 
-        let mut mp = HashSet::new();
-        for i in g.node_indices() {
-            mp.insert(g[i]);
-            eprintln!("{:?}", g[i]);
+                while let Some(i) = d.pop() {
+                    let state = g[i];
+                    v.push(state);
+                }
+
+                Some(v)
+            }
+            None => None,
         }
-
-        println!("Cnt: {}", mp.len());
-        println!("NodeCount: {}", g.node_count());
     }
 
     pub fn gen() -> Self {
         let mut hexmap = HashMap::new();
         let start = Hex::from_axial(1, 1);
-        let goal = Hex::from_axial(4, 1);
+        let goal = Hex::from_axial(6, 7);
 
-        for q in 1..=4 {
-            for r in 1..=1 {
+        for q in 0..=8 {
+            for r in 0..=8 {
                 let hex = Hex::from_axial(q, r);
                 hexmap.insert(hex, true);
             }
