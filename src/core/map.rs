@@ -5,7 +5,7 @@ use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 
 use crate::core::hex::*;
-use crate::core::player::*;
+use crate::core::game::*;
 
 pub struct HexMap {
     pub hexmap: HashMap<Hex, bool>,
@@ -117,10 +117,14 @@ impl HexMap {
     pub fn gen() -> Self {
         let mut hexmap = HashMap::new();
         let start = Hex::from_axial(1, 1);
-        let goal = Hex::from_axial(6, 7);
+        let goal = Hex::from_axial(4, 3);
 
-        for q in 0..=10 {
-            for r in 0..=10 {
+        hexmap.insert(start, true);
+        for q in 0..=6 {
+            for r in 0..=6 {
+                if q + r % 3 == 2 {
+                    continue;
+                }
                 let hex = Hex::from_axial(q, r);
                 hexmap.insert(hex, true);
             }

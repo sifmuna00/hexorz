@@ -1,3 +1,3 @@
+pub mod game;
 pub mod hex;
 pub mod map;
-pub mod player;
