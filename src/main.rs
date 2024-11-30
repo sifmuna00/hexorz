@@ -27,7 +27,7 @@ void main() {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut game_state = GameState::Playing;
+    let mut game_state = GameState::MainMenu;
     let mut game = Game::init().await;
     let mut is_debug = false;
 
@@ -77,13 +77,14 @@ async fn main() {
                     game.player_state = PlayerState::Standing(game.map.start);
                     game_state = GameState::Playing;
                 }
+
                 let text = "Press SPACE to start";
                 let text_dimensions = measure_text(text, None, 50, 1.0);
                 draw_text(
                     text,
                     screen_width() / 2.0 - text_dimensions.width / 2.0,
                     screen_height() / 2.0,
-                    HEXES_SIZE,
+                    50.0,
                     RED,
                 );
             }
@@ -116,7 +117,7 @@ async fn main() {
                     text,
                     screen_width() / 2.0 - text_dimensions.width / 2.0,
                     screen_height() / 2.0,
-                    HEXES_SIZE,
+                    50.0,
                     RED,
                 );
             }
@@ -131,8 +132,8 @@ async fn main() {
                     text,
                     screen_width() / 2.0 - text_dimensions.width / 2.0,
                     screen_height() / 2.0,
-                    HEXES_SIZE,
-                    RED,
+                    50.0,
+                    GREEN,
                 );
             }
         }
