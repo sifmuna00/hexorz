@@ -223,10 +223,10 @@ impl Game {
     fn draw_player_hex(
         &self,
         standing_texture: &Texture2D,
-        flat_texture_nw: &Texture2D,
-        flat_texture_ne: &Texture2D,
-        flat_texture_e: &Texture2D,
-        flat_texture_w: &Texture2D,
+        flat_diag_main_texture: &Texture2D,
+        flat_diag_other_texture: &Texture2D,
+        flat_e_texture: &Texture2D,
+        flat_w_texture: &Texture2D,
     ) {
         match self.player_state {
             PlayerState::Standing(hex) => {
@@ -239,27 +239,27 @@ impl Game {
                 match dir {
                     HexDirection::NW => {
                         let pixel = self.layout.hex_to_pixel(tail) + vec2(-4.0, -13.0);
-                        draw_texture(flat_texture_nw, pixel.x, pixel.y, WHITE);
+                        draw_texture(flat_diag_main_texture, pixel.x, pixel.y, WHITE);
                     }
                     HexDirection::SE => {
                         let pixel = self.layout.hex_to_pixel(head) + vec2(-4.0, -13.0);
-                        draw_texture(flat_texture_nw, pixel.x, pixel.y, WHITE);
+                        draw_texture(flat_diag_main_texture, pixel.x, pixel.y, WHITE);
                     }
                     HexDirection::NE => {
                         let pixel = self.layout.hex_to_pixel(head) + vec2(-4.0, -28.0);
-                        draw_texture(flat_texture_ne, pixel.x, pixel.y, WHITE);
+                        draw_texture(flat_diag_other_texture, pixel.x, pixel.y, WHITE);
                     }
                     HexDirection::SW => {
                         let pixel = self.layout.hex_to_pixel(tail) + vec2(-4.0, -28.0);
-                        draw_texture(flat_texture_ne, pixel.x, pixel.y, WHITE);
+                        draw_texture(flat_diag_other_texture, pixel.x, pixel.y, WHITE);
                     }
                     HexDirection::W => {
                         let pixel = self.layout.hex_to_pixel(tail) + vec2(2.0, -9.0);
-                        draw_texture(flat_texture_w, pixel.x, pixel.y, WHITE);
+                        draw_texture(flat_w_texture, pixel.x, pixel.y, WHITE);
                     }
                     HexDirection::E => {
                         let pixel = self.layout.hex_to_pixel(head) + vec2(2.0, -9.0);
-                        draw_texture(flat_texture_e, pixel.x, pixel.y, WHITE);
+                        draw_texture(flat_e_texture, pixel.x, pixel.y, WHITE);
                     }
                 }
             }
@@ -293,7 +293,7 @@ async fn main() {
     };
 
     let tmp = HexMap::gen();
-    let mut hexmap = tmp.hexmap.clone();
+    let hexmap = tmp.hexmap.clone();
     let player_hex = tmp.start;
     let goal = tmp.goal;
 
@@ -312,10 +312,10 @@ async fn main() {
     set_pc_assets_folder("assets");
     let tile_texture: Texture2D = load_texture("hex_tile.png").await.unwrap();
     let standing_texture: Texture2D = load_texture("hex_standing.png").await.unwrap();
-    let flat_texture_nw: Texture2D = load_texture("hex_flat_nw.png").await.unwrap();
-    let flat_texture_ne: Texture2D = load_texture("hex_flat_ne.png").await.unwrap();
-    let flat_texture_w: Texture2D = load_texture("hex_flat_w.png").await.unwrap();
-    let flat_texture_e: Texture2D = load_texture("hex_flat_e.png").await.unwrap();
+    let flat_diag_main_texture: Texture2D = load_texture("hex_flat_diag_main.png").await.unwrap();
+    let flat_diag_other_texture: Texture2D = load_texture("hex_flat_diag_other.png").await.unwrap();
+    let flat_w_texture: Texture2D = load_texture("hex_flat_w.png").await.unwrap();
+    let flat_e_texture: Texture2D = load_texture("hex_flat_e.png").await.unwrap();
 
     // set_camera(&Camera2D {
     //     zoom: vec2(0.01, 0.01),
@@ -362,10 +362,10 @@ async fn main() {
                 game.draw_hexes(&tile_texture);
                 game.draw_player_hex(
                     &standing_texture,
-                    &flat_texture_nw,
-                    &flat_texture_ne,
-                    &flat_texture_e,
-                    &flat_texture_w,
+                    &flat_diag_main_texture,
+                    &flat_diag_other_texture,
+                    &flat_e_texture,
+                    &flat_w_texture,
                 );
 
                 if is_debug {
