@@ -14,7 +14,7 @@ pub struct HexMap {
 }
 
 impl HexMap {
-    pub fn solve_path(&self) -> Option<Vec<PlayerState>> {
+    pub fn solve_path(&self, hex_start: Hex) -> Option<Vec<PlayerState>> {
         let mut g = Graph::new();
 
         let mut start = NodeIndex::default();
@@ -35,7 +35,7 @@ impl HexMap {
                     idx[&cur]
                 };
 
-                if *head == self.start {
+                if *head == hex_start {
                     start = icur;
                 }
 

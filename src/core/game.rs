@@ -5,6 +5,10 @@ use crate::core::map::*;
 use crate::HEXES_SIZE;
 use macroquad::prelude::*;
 
+use super::hex;
+
+const MAP_ZOOM: f32 = 2.0;
+
 #[derive(Debug, Clone, Copy, PartialEq, Hash, Eq)]
 pub enum PlayerState {
     Standing(Hex),
@@ -67,10 +71,8 @@ pub enum GameState {
 
 pub struct Game {
     pub layout: Layout,
-    pub hexmap: HashMap<Hex, bool>,
     pub player_state: PlayerState,
-    pub start: Hex,
-    pub goal: Hex,
+    pub map: HexMap,
     tile_texture: Texture2D,
     standing_texture: Texture2D,
     flat_diag_main_texture: Texture2D,
@@ -105,9 +107,7 @@ impl Game {
         };
 
         let tmp = HexMap::gen();
-        let hexmap = tmp.hexmap;
         let player_hex = tmp.start;
-        let goal = tmp.goal;
 
         // let mut game = Game::init();
 
@@ -121,10 +121,8 @@ impl Game {
 
         Game {
             layout: pointy.clone(),
-            hexmap,
             player_state: PlayerState::Standing(player_hex),
-            start: player_hex,
-            goal: goal,
+            map: tmp,
             tile_texture,
             standing_texture,
             flat_diag_main_texture,
@@ -185,14 +183,8 @@ impl Game {
         draw_circle(next_pixel.x, next_pixel.y, HEXES_SIZE / 5.0, RED);
     }
 
-    pub fn draw_ans(&self) {
-        let hm = HexMap {
-            hexmap: self.hexmap.clone(),
-            start: self.start,
-            goal: self.goal,
-        };
-
-        let path = hm.solve_path();
+    pub fn draw_ans(&self, hex_start: Hex) {
+        let path = self.map.solve_path(hex_start);
 
         if let Some(path) = path {
             let mut path = path;
@@ -219,6 +211,8 @@ impl Game {
             return;
         }
 
+        let hexmap = &self.map.hexmap;
+
         self.player_state = match self.player_state {
             PlayerState::Standing(head) => PlayerState::Flat(head + delta * 2, head + delta),
             PlayerState::Flat(head, tail) => {
@@ -237,14 +231,14 @@ impl Game {
 
         self.player_state = match self.player_state {
             PlayerState::Standing(hex) => {
-                if self.hexmap.contains_key(&hex) {
+                if hexmap.contains_key(&hex) {
                     PlayerState::Standing(hex)
                 } else {
                     PlayerState::Dead
                 }
             }
             PlayerState::Flat(head, tail) => {
-                if self.hexmap.contains_key(&head) && self.hexmap.contains_key(&tail) {
+                if hexmap.contains_key(&head) && hexmap.contains_key(&tail) {
                     PlayerState::Flat(head, tail)
                 } else {
                     PlayerState::Dead
@@ -273,7 +267,9 @@ impl Game {
     }
 
     pub fn draw_tiles(&self, texture: &Texture2D) {
-        let v = self.hexmap.keys().collect::<Vec<_>>();
+        let hexmap = &self.map.hexmap;
+        let goal = self.map.goal;
+        let v = hexmap.keys().collect::<Vec<_>>();
         let mut hexes = v.iter().map(|hex| hex.to_offset()).collect::<Vec<_>>();
 
         hexes.sort_by(|a, b| a.1.cmp(&b.1).then(a.0.cmp(&b.0)));
@@ -282,8 +278,9 @@ impl Game {
             let h = Hex::from_offset(hex);
             let pixel = self.layout.hex_to_pixel(h);
 
-            if h == self.goal {
-                draw_texture(texture, pixel.x, pixel.y, BLACK);
+            if h == goal {
+                // draw_texture(texture, pixel.x, pixel.y, BLACK);
+                continue;
             } else {
                 draw_texture(texture, pixel.x, pixel.y, WHITE);
             }
@@ -339,6 +336,15 @@ impl Game {
     }
 
     pub fn draw(&self, is_debug: bool) {
+        set_camera(&Camera2D {
+            zoom: vec2(
+                MAP_ZOOM / screen_width() * 2.0,
+                MAP_ZOOM / screen_height() * 2.0,
+            ),
+            target: self.get_center(),
+            ..Default::default()
+        });
+
         self.draw_tiles(&self.tile_texture);
         self.draw_player_hex(
             &self.standing_texture,
@@ -349,7 +355,32 @@ impl Game {
         );
 
         if is_debug {
-            self.draw_ans();
+            // if let PlayerState::Standing(hex) = self.player_state {
+            //     self.draw_ans(hex);
+            // }
+
+            self.draw_ans(self.map.start);
+        }
+    }
+
+    fn get_center(&self) -> Vec2 {
+        let hexmap = &self.map.hexmap;
+        let mut top_left = vec2(f32::MAX, f32::MAX);
+        let mut bottom_right = vec2(f32::MIN, f32::MIN);
+
+        for hex in hexmap.keys() {
+            let pixel = self.layout.hex_to_pixel(*hex);
+
+            top_left.x = top_left.x.min(pixel.x);
+            top_left.y = top_left.y.min(pixel.y);
+
+            bottom_right.x = bottom_right.x.max(pixel.x);
+            bottom_right.y = bottom_right.y.max(pixel.y);
+        }
+
+        Vec2 {
+            x: (top_left.x + bottom_right.x) / 2.0,
+            y: (top_left.y + bottom_right.y) / 2.0,
         }
     }
 }
