@@ -222,7 +222,7 @@ impl Game {
     // 9b4747
     fn draw_player_hex(
         &self,
-        tower_texture: &Texture2D,
+        standing_texture: &Texture2D,
         flat_texture_nw: &Texture2D,
         flat_texture_ne: &Texture2D,
         flat_texture_e: &Texture2D,
@@ -231,7 +231,7 @@ impl Game {
         match self.player_state {
             PlayerState::Standing(hex) => {
                 let pixel = self.layout.hex_to_pixel(hex) + vec2(0.0, -32.0);
-                draw_texture(tower_texture, pixel.x, pixel.y, WHITE);
+                draw_texture(standing_texture, pixel.x, pixel.y, WHITE);
             }
             PlayerState::Flat(head, tail) => {
                 let dir = HexDirection::get_dir_from_to(head, tail);
@@ -311,7 +311,7 @@ async fn main() {
 
     set_pc_assets_folder("assets");
     let tile_texture: Texture2D = load_texture("hex_0.png").await.unwrap();
-    let tower_texture: Texture2D = load_texture("tower_hex_red.png").await.unwrap();
+    let standing_texture: Texture2D = load_texture("hex_standing.png").await.unwrap();
     let flat_texture_nw: Texture2D = load_texture("hex_flat_nw.png").await.unwrap();
     let flat_texture_ne: Texture2D = load_texture("hex_flat_ne.png").await.unwrap();
     let flat_texture_w: Texture2D = load_texture("hex_flat_w.png").await.unwrap();
@@ -361,7 +361,7 @@ async fn main() {
                 // game.draw();
                 game.draw_hexes(&tile_texture);
                 game.draw_player_hex(
-                    &tower_texture,
+                    &standing_texture,
                     &flat_texture_nw,
                     &flat_texture_ne,
                     &flat_texture_e,
