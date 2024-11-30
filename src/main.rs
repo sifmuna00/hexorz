@@ -310,7 +310,7 @@ async fn main() {
     tmp.solve_path();
 
     set_pc_assets_folder("assets");
-    let tile_texture: Texture2D = load_texture("hex_0.png").await.unwrap();
+    let tile_texture: Texture2D = load_texture("hex_tile.png").await.unwrap();
     let standing_texture: Texture2D = load_texture("hex_standing.png").await.unwrap();
     let flat_texture_nw: Texture2D = load_texture("hex_flat_nw.png").await.unwrap();
     let flat_texture_ne: Texture2D = load_texture("hex_flat_ne.png").await.unwrap();
