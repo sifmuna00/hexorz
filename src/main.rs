@@ -2,10 +2,15 @@ use ::core::f32;
 use std::{collections::HashMap, env::consts};
 
 use macroquad::prelude::*;
+use petgraph::Direction;
 
 mod core;
 
-use core::{hex::*, map::HexMap, player::PlayerState};
+use core::{
+    hex::{self, *},
+    map::HexMap,
+    player::PlayerState,
+};
 
 enum GameState {
     MainMenu,
@@ -193,9 +198,72 @@ impl Game {
     }
 
     fn draw_hexes(&self, texture: &Texture2D) {
-        for (hex, _) in &self.hexmap {
-            let pixel = self.layout.hex_to_pixel(*hex) - Vec2::new(25.0, 25.0);
-            draw_texture(texture, pixel.x, pixel.y, WHITE);
+        let v = self.hexmap.keys().collect::<Vec<_>>();
+        let mut hexes = v.iter().map(|hex| hex.to_offset()).collect::<Vec<_>>();
+
+        hexes.sort_by(|a, b| a.1.cmp(&b.1).then(a.0.cmp(&b.0)));
+        // for (hex, _) in &self.hexmap {
+        //     let pixel = self.layout.hex_to_pixel(*hex);
+        //     draw_texture(texture, pixel.x, pixel.y, WHITE);
+        // }
+
+        for hex in hexes {
+            let h = Hex::from_offset(hex);
+            let pixel = self.layout.hex_to_pixel(h);
+
+            if (h == self.goal) {
+                draw_texture(texture, pixel.x, pixel.y, BLACK);
+            } else {
+                draw_texture(texture, pixel.x, pixel.y, WHITE);
+            }
+        }
+    }
+
+    // 9b4747
+    fn draw_player_hex(
+        &self,
+        tower_texture: &Texture2D,
+        flat_texture_nw: &Texture2D,
+        flat_texture_ne: &Texture2D,
+        flat_texture_e: &Texture2D,
+        flat_texture_w: &Texture2D,
+    ) {
+        match self.player_state {
+            PlayerState::Standing(hex) => {
+                let pixel = self.layout.hex_to_pixel(hex) + vec2(0.0, -32.0);
+                draw_texture(tower_texture, pixel.x, pixel.y, WHITE);
+            }
+            PlayerState::Flat(head, tail) => {
+                let dir = HexDirection::get_dir_from_to(head, tail);
+
+                match dir {
+                    HexDirection::NW => {
+                        let pixel = self.layout.hex_to_pixel(tail) + vec2(-4.0, -13.0);
+                        draw_texture(flat_texture_nw, pixel.x, pixel.y, WHITE);
+                    }
+                    HexDirection::SE => {
+                        let pixel = self.layout.hex_to_pixel(head) + vec2(-4.0, -13.0);
+                        draw_texture(flat_texture_nw, pixel.x, pixel.y, WHITE);
+                    }
+                    HexDirection::NE => {
+                        let pixel = self.layout.hex_to_pixel(head) + vec2(-4.0, -28.0);
+                        draw_texture(flat_texture_ne, pixel.x, pixel.y, WHITE);
+                    }
+                    HexDirection::SW => {
+                        let pixel = self.layout.hex_to_pixel(tail) + vec2(-4.0, -28.0);
+                        draw_texture(flat_texture_ne, pixel.x, pixel.y, WHITE);
+                    }
+                    HexDirection::W => {
+                        let pixel = self.layout.hex_to_pixel(tail) + vec2(2.0, -9.0);
+                        draw_texture(flat_texture_w, pixel.x, pixel.y, WHITE);
+                    }
+                    HexDirection::E => {
+                        let pixel = self.layout.hex_to_pixel(head) + vec2(2.0, -9.0);
+                        draw_texture(flat_texture_e, pixel.x, pixel.y, WHITE);
+                    }
+                }
+            }
+            _ => {}
         }
     }
 }
@@ -213,14 +281,14 @@ async fn main() {
         orientation: Orientation::LAYOUT_POINTY,
         // Point(W/sqrt(3), H/2)
         size: Vec2 {
-            x: HEXES_SIZE / SQRT_3,
-            y: (32.0) / 2.0,
+            x: 31.0 / SQRT_3,
+            y: 21.0 / 2.0,
         },
         origin: Vec2 {
-            // x: screen_height() / 2.0,
-            // y: screen_width() / 2.0,
-            x: 0.0,
-            y: 0.0,
+            x: screen_height() / 2.0 - 300.0,
+            y: screen_width() / 2.0,
+            // x: 0.0,
+            // y: 0.0,
         },
     };
 
@@ -242,16 +310,18 @@ async fn main() {
     tmp.solve_path();
 
     set_pc_assets_folder("assets");
-    let texture: Texture2D = load_texture("hex_0.png").await.unwrap();
+    let tile_texture: Texture2D = load_texture("hex_0.png").await.unwrap();
+    let tower_texture: Texture2D = load_texture("tower_hex_red.png").await.unwrap();
+    let flat_texture_nw: Texture2D = load_texture("hex_flat_nw.png").await.unwrap();
+    let flat_texture_ne: Texture2D = load_texture("hex_flat_ne.png").await.unwrap();
+    let flat_texture_w: Texture2D = load_texture("hex_flat_w.png").await.unwrap();
+    let flat_texture_e: Texture2D = load_texture("hex_flat_e.png").await.unwrap();
 
-    // loop {
-    //     clear_background(WHITE);
-
-    //     draw_rectangle(0.0, 0.0, SIZE, SIZE, RED);
-    //     draw_texture(&texture, 0.0 + 16.0, 0.0, RED);
-
-    //     next_frame().await
-    // }
+    // set_camera(&Camera2D {
+    //     zoom: vec2(0.01, 0.01),
+    //     target: vec2(screen_width() / 2., screen_height() / 2.),
+    //     ..Default::default()
+    // });
 
     let mut is_debug = false;
     loop {
@@ -288,8 +358,15 @@ async fn main() {
                     game_state = GameState::GameWon;
                 }
 
-                game.draw();
-                game.draw_hexes(&texture);
+                // game.draw();
+                game.draw_hexes(&tile_texture);
+                game.draw_player_hex(
+                    &tower_texture,
+                    &flat_texture_nw,
+                    &flat_texture_ne,
+                    &flat_texture_e,
+                    &flat_texture_w,
+                );
 
                 if is_debug {
                     game.draw_ans();

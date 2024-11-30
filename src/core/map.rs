@@ -119,8 +119,8 @@ impl HexMap {
         let start = Hex::from_axial(1, 1);
         let goal = Hex::from_axial(6, 7);
 
-        for q in 0..=8 {
-            for r in 0..=8 {
+        for q in 0..=10 {
+            for r in 0..=10 {
                 let hex = Hex::from_axial(q, r);
                 hexmap.insert(hex, true);
             }

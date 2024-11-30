@@ -20,6 +20,19 @@ impl Hex {
         Hex { q, r, s: -q - r }
     }
 
+    pub fn from_offset(offset: (i32, i32)) -> Self {
+        let (col, row) = offset;
+        let q = col - (row + (row & 1)) / 2;
+        let r = row;
+        Hex::from_axial(q, r)
+    }
+
+    pub const fn to_offset(&self) -> (i32, i32) {
+        let col = self.q + (self.r + (self.r & 1)) / 2;
+        let row = self.r;
+        (col, row)
+    }
+
     pub fn neighbor(&self, dir: HexDirection) -> Hex {
         *self + DIR[dir.to_usize()]
     }
