@@ -170,7 +170,7 @@ async fn main() {
 
 fn window_conf() -> Conf {
     Conf {
-        window_title: "My Game".to_owned(),
+        window_title: "Hexorz".to_owned(),
         ..Default::default()
     }
 }
