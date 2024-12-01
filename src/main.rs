@@ -74,7 +74,7 @@ async fn main() {
                 set_default_camera();
 
                 if is_key_pressed(KeyCode::Space) {
-                    game.player_state = PlayerState::Standing(game.map.start);
+                    game.update_map();
                     game_state = GameState::Playing;
                 }
 

@@ -106,23 +106,13 @@ impl Game {
             },
         };
 
-        let tmp = HexMap::gen();
-        let player_hex = tmp.start;
-
-        // let mut game = Game::init();
-
-        // Game {
-        //     layout: pointy.clone(),
-        //     hexmap,
-        //     player_state: PlayerState::Standing(player_hex),
-        //     start: player_hex,
-        //     goal: goal,
-        // }
+        let game_map = HexMap::gen();
+        game_map.dump_map(5);
 
         Game {
             layout: pointy.clone(),
-            player_state: PlayerState::Standing(player_hex),
-            map: tmp,
+            player_state: PlayerState::Standing(game_map.start),
+            map: game_map,
             tile_texture,
             standing_texture,
             flat_diag_main_texture,
@@ -130,6 +120,13 @@ impl Game {
             flat_w_texture,
             flat_e_texture,
         }
+    }
+
+    pub fn update_map(&mut self) {
+        let game_map = HexMap::gen();
+
+        self.player_state = PlayerState::Standing(game_map.start);
+        self.map = game_map;
     }
 
     fn draw_flat(&self, state: PlayerState) {
@@ -355,11 +352,11 @@ impl Game {
         );
 
         if is_debug {
-            // if let PlayerState::Standing(hex) = self.player_state {
-            //     self.draw_ans(hex);
-            // }
+            if let PlayerState::Standing(hex) = self.player_state {
+                self.draw_ans(hex);
+            }
 
-            self.draw_ans(self.map.start);
+            // self.draw_ans(self.map.start);
         }
     }
 
