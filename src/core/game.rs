@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
+use super::hex;
 use crate::core::hex::*;
 use crate::core::map::*;
 use crate::HEXES_SIZE;
+use macroquad::audio::load_sound;
+use macroquad::audio::Sound;
 use macroquad::prelude::*;
-
-use super::hex;
 
 const MAP_ZOOM: f32 = 2.0;
 
@@ -73,12 +74,15 @@ pub struct Game {
     pub layout: Layout,
     pub player_state: PlayerState,
     pub map: HexMap,
+    pub level_count: u32,
     tile_texture: Texture2D,
     standing_texture: Texture2D,
     flat_diag_main_texture: Texture2D,
     flat_diag_other_texture: Texture2D,
     flat_w_texture: Texture2D,
     flat_e_texture: Texture2D,
+    pub sound_explosion: Sound,
+    pub theme_music: Sound,
 }
 
 impl Game {
@@ -92,6 +96,8 @@ impl Game {
             load_texture("hex_flat_diag_other.png").await.unwrap();
         let flat_w_texture: Texture2D = load_texture("hex_flat_w.png").await.unwrap();
         let flat_e_texture: Texture2D = load_texture("hex_flat_e.png").await.unwrap();
+        let sound_explosion: Sound = load_sound("explosion.wav").await.unwrap();
+        let theme_music: Sound = load_sound("through_space.ogg").await.unwrap();
 
         let pointy: Layout = Layout {
             orientation: Orientation::LAYOUT_POINTY,
@@ -113,20 +119,106 @@ impl Game {
             layout: pointy.clone(),
             player_state: PlayerState::Standing(game_map.start),
             map: game_map,
+            level_count: 0,
             tile_texture,
             standing_texture,
             flat_diag_main_texture,
             flat_diag_other_texture,
             flat_w_texture,
             flat_e_texture,
+            sound_explosion,
+            theme_music,
         }
     }
 
-    pub fn update_map(&mut self) {
-        let game_map = HexMap::gen();
-
+    fn update_map(&mut self, game_map: HexMap) {
         self.player_state = PlayerState::Standing(game_map.start);
         self.map = game_map;
+    }
+
+    pub fn update_level(&mut self, is_next: bool) {
+        if is_next {
+            self.level_count += 1;
+        }
+
+        match self.level_count {
+            0 => {
+                self.update_map(load_map(HexMap::PREMADE_MAP_0));
+            }
+            1 => {
+                self.update_map(load_map(HexMap::PREMADE_MAP_1));
+            }
+            2 => {
+                self.update_map(load_map(HexMap::PREMADE_MAP_2));
+            }
+            3 => {
+                self.update_map(load_map(HexMap::PREMADE_MAP_3));
+            }
+            _ => {
+                self.update_map(HexMap::gen());
+            }
+        }
+    }
+
+    fn move_player(&mut self, direction: HexDirection) {
+        let delta = direction.to_hex();
+        if delta == Hex::from_axial(0, 0) {
+            return;
+        }
+
+        let hexmap = &self.map.hexmap;
+
+        self.player_state = match self.player_state {
+            PlayerState::Standing(head) => PlayerState::Flat(head + delta * 2, head + delta),
+            PlayerState::Flat(head, tail) => {
+                let diff = HexDirection::get_dir_from_to(tail, head);
+
+                if diff == direction {
+                    PlayerState::Standing(head + delta)
+                } else if diff == direction.opposite() {
+                    PlayerState::Standing(tail + delta)
+                } else {
+                    PlayerState::Flat(head + delta, tail + delta)
+                }
+            }
+            _ => PlayerState::Dead,
+        };
+
+        self.player_state = match self.player_state {
+            PlayerState::Standing(hex) => {
+                if hexmap.contains_key(&hex) {
+                    PlayerState::Standing(hex)
+                } else {
+                    PlayerState::Dead
+                }
+            }
+            PlayerState::Flat(head, tail) => {
+                if hexmap.contains_key(&head) && hexmap.contains_key(&tail) {
+                    PlayerState::Flat(head, tail)
+                } else {
+                    PlayerState::Dead
+                }
+            }
+            _ => PlayerState::Dead,
+        };
+    }
+
+    pub fn update(&mut self) {
+        if let Some(key) = get_last_key_pressed() {
+            let dir: Option<HexDirection> = match key {
+                KeyCode::W => Some(HexDirection::NW),
+                KeyCode::E => Some(HexDirection::NE),
+                KeyCode::D => Some(HexDirection::E),
+                KeyCode::A => Some(HexDirection::W),
+                KeyCode::Z => Some(HexDirection::SW),
+                KeyCode::X => Some(HexDirection::SE),
+                _ => None,
+            };
+
+            if let Some(dir) = dir {
+                self.move_player(dir);
+            }
+        }
     }
 
     fn draw_flat(&self, state: PlayerState) {
@@ -199,67 +291,6 @@ impl Game {
             }
         } else {
             println!("No path found");
-        }
-    }
-
-    fn move_player(&mut self, direction: HexDirection) {
-        let delta = direction.to_hex();
-        if delta == Hex::from_axial(0, 0) {
-            return;
-        }
-
-        let hexmap = &self.map.hexmap;
-
-        self.player_state = match self.player_state {
-            PlayerState::Standing(head) => PlayerState::Flat(head + delta * 2, head + delta),
-            PlayerState::Flat(head, tail) => {
-                let diff = HexDirection::get_dir_from_to(tail, head);
-
-                if diff == direction {
-                    PlayerState::Standing(head + delta)
-                } else if diff == direction.opposite() {
-                    PlayerState::Standing(tail + delta)
-                } else {
-                    PlayerState::Flat(head + delta, tail + delta)
-                }
-            }
-            _ => PlayerState::Dead,
-        };
-
-        self.player_state = match self.player_state {
-            PlayerState::Standing(hex) => {
-                if hexmap.contains_key(&hex) {
-                    PlayerState::Standing(hex)
-                } else {
-                    PlayerState::Dead
-                }
-            }
-            PlayerState::Flat(head, tail) => {
-                if hexmap.contains_key(&head) && hexmap.contains_key(&tail) {
-                    PlayerState::Flat(head, tail)
-                } else {
-                    PlayerState::Dead
-                }
-            }
-            _ => PlayerState::Dead,
-        };
-    }
-
-    pub fn update(&mut self) {
-        if let Some(key) = get_last_key_pressed() {
-            let dir: Option<HexDirection> = match key {
-                KeyCode::W => Some(HexDirection::NW),
-                KeyCode::E => Some(HexDirection::NE),
-                KeyCode::D => Some(HexDirection::E),
-                KeyCode::A => Some(HexDirection::W),
-                KeyCode::Z => Some(HexDirection::SW),
-                KeyCode::X => Some(HexDirection::SE),
-                _ => None,
-            };
-
-            if let Some(dir) = dir {
-                self.move_player(dir);
-            }
         }
     }
 

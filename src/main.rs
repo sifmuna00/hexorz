@@ -1,4 +1,7 @@
 use ::core::f32;
+use macroquad::audio::{
+    load_sound, play_sound, play_sound_once, set_sound_volume, stop_sound, PlaySoundParams,
+};
 use macroquad::prelude::*;
 
 mod core;
@@ -49,6 +52,14 @@ async fn main() {
     )
     .unwrap();
 
+    play_sound(
+        &game.theme_music,
+        PlaySoundParams {
+            looped: true,
+            volume: 0.5,
+        },
+    );
+
     loop {
         // clear_background(WHITE);
 
@@ -72,9 +83,8 @@ async fn main() {
         match game_state {
             GameState::MainMenu => {
                 set_default_camera();
-
                 if is_key_pressed(KeyCode::Space) {
-                    game.update_map();
+                    game.update_level(false);
                     game_state = GameState::Playing;
                 }
 
@@ -89,6 +99,8 @@ async fn main() {
                 );
             }
             GameState::Playing => {
+                set_sound_volume(&game.theme_music, 0.8);
+
                 if is_key_pressed(KeyCode::Y) {
                     is_debug = !is_debug;
                 }
@@ -97,19 +109,29 @@ async fn main() {
 
                 if let PlayerState::Dead = game.player_state {
                     game_state = GameState::GameOver;
+                    set_sound_volume(&game.theme_music, 0.4);
+
+                    play_sound_once(&game.sound_explosion);
                 }
 
                 if game.player_state == PlayerState::Standing(game.map.goal) {
                     game_state = GameState::GameWon;
+                    set_sound_volume(&game.theme_music, 0.4);
                 }
 
                 game.draw(is_debug);
-            }
-            GameState::GameOver => {
+
                 set_default_camera();
 
+                let text = format!("Level: {}", game.level_count);
+                let text_dimensions = measure_text(&text, None, 50, 1.0);
+
+                draw_text(&text, 10.0, 10.0 + text_dimensions.height, 50.0, GREEN);
+            }
+            GameState::GameOver => {
                 if is_key_pressed(KeyCode::Space) {
                     game_state = GameState::MainMenu;
+                    game.level_count = 0;
                 }
                 let text = "GAME OVER!";
                 let text_dimensions = measure_text(text, None, 50, 1.0);
@@ -122,14 +144,16 @@ async fn main() {
                 );
             }
             GameState::GameWon => {
-                set_default_camera();
                 if is_key_pressed(KeyCode::Space) {
-                    game_state = GameState::MainMenu;
+                    game.update_level(true);
+                    game_state = GameState::Playing;
                 }
-                let text = "YOU WON!";
-                let text_dimensions = measure_text(text, None, 50, 1.0);
+
+                let text = format!("Level {} passed", game.level_count);
+                let text_dimensions = measure_text(&text, None, 50, 1.0);
+
                 draw_text(
-                    text,
+                    &text,
                     screen_width() / 2.0 - text_dimensions.width / 2.0,
                     screen_height() / 2.0,
                     50.0,

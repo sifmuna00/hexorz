@@ -1,8 +1,8 @@
 [package]
-name = "secrets"
+name = "hexorz"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-macroquad = "0.4.0"
+macroquad = { version = "0.4.0", features = ["audio"] }
 petgraph = "0.6.5"
