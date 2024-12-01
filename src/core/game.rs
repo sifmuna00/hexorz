@@ -1,12 +1,11 @@
 use std::collections::HashMap;
 
-use super::hex;
+use macroquad::audio::{load_sound, Sound};
+use macroquad::prelude::*;
+
 use crate::core::hex::*;
 use crate::core::map::*;
 use crate::HEXES_SIZE;
-use macroquad::audio::load_sound;
-use macroquad::audio::Sound;
-use macroquad::prelude::*;
 
 const MAP_ZOOM: f32 = 2.0;
 
@@ -39,8 +38,6 @@ impl PlayerState {
     }
 
     pub fn next_state_in_map(&self, direction: HexDirection, hexmap: &HashMap<Hex, bool>) -> Self {
-        let delta = direction.to_hex();
-
         let state = self.next_state(direction);
 
         match state {

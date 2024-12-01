@@ -1,7 +1,7 @@
-use macroquad::{color::Color, math::*};
+use macroquad::math::*;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
-pub const SQRT_3: f32 = 1.732050807568877293527446341505872367_f32;
+pub const SQRT_3: f32 = 1.732_050_8_f32;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Hex {
@@ -10,6 +10,7 @@ pub struct Hex {
     pub s: i32,
 }
 
+#[allow(dead_code)]
 impl Hex {
     pub fn from_cube(q: i32, r: i32, s: i32) -> Self {
         assert_eq!(q + r + s, 0);
@@ -125,42 +126,6 @@ impl MulAssign<i32> for Hex {
     }
 }
 
-impl Hex {
-    pub fn length(&self) -> i32 {
-        (self.q.abs() + self.r.abs() + self.s.abs()) / 2
-    }
-
-    pub fn distance(self, _rhs: Hex) -> i32 {
-        (self - _rhs).length()
-    }
-}
-
-pub struct FractionalHex {
-    pub q: f32,
-    pub r: f32,
-    pub s: f32,
-}
-
-impl FractionalHex {
-    pub fn round(&self) -> Hex {
-        let q = self.q.round() as i32;
-        let r = self.r.round() as i32;
-        let s = self.s.round() as i32;
-
-        let q_diff = (q as f32 - self.q).abs();
-        let r_diff = (r as f32 - self.r).abs();
-        let s_diff = (s as f32 - self.s).abs();
-
-        if q_diff > r_diff && q_diff > s_diff {
-            Hex::from_cube(-r - s, r, s)
-        } else if r_diff > s_diff {
-            Hex::from_cube(q, -q - s, s)
-        } else {
-            Hex::from_cube(q, r, -q - r)
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct Orientation {
     pub f: Mat2,
@@ -191,28 +156,6 @@ impl Layout {
 
         let res = mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin;
         res
-    }
-
-    pub fn pixel_to_iso(&self, p: Vec2, offset: Vec2) -> Vec2 {
-        let mat = Mat2::from_cols_array(&[0.5, 0.25, -0.5, 0.25]);
-        let size = self.size;
-        let origin = self.origin;
-
-        mat * p
-    }
-
-    pub fn pixel_to_hex(&self, p: Vec2) -> FractionalHex {
-        let mat = &self.orientation;
-        let size = self.size;
-        let origin = self.origin;
-
-        let pt = (mat.f.inverse() * (p - origin)) / size;
-
-        FractionalHex {
-            q: pt.x,
-            r: pt.y,
-            s: -pt.x - pt.y,
-        }
     }
 }
 

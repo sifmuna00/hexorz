@@ -1,0 +1,214 @@
+warning: fields `f_inv` and `start_angle` are never read
+   --> src/core/hex.rs:132:9
+    |
+130 | pub struct Orientation {
+    |            ----------- fields in this struct
+131 |     pub f: Mat2,
+132 |     pub f_inv: Mat2,
+    |         ^^^^^
+133 |     pub start_angle: f64,
+    |         ^^^^^^^^^^^
+    |
+    = note: `Orientation` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` on by default
+
+warning: float has excessive precision
+ --> src/core/hex.rs:4:25
+  |
+4 | pub const SQRT_3: f32 = 1.732050807568877293527446341505872367_f32;
+  |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider changing the type or truncating it to: `1.732_050_8_f32`
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#excessive_precision
+  = note: `#[warn(clippy::excessive_precision)]` on by default
+
+warning: methods with the following characteristics: (`to_*` and `self` type is `Copy`) usually take `self` by value
+  --> src/core/hex.rs:31:28
+   |
+31 |     pub const fn to_offset(&self) -> (i32, i32) {
+   |                            ^^^^^
+   |
+   = help: consider choosing a less ambiguous name
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#wrong_self_convention
+   = note: `#[warn(clippy::wrong_self_convention)]` on by default
+
+warning: the loop variable `i` is only used to index `DIR`
+  --> src/core/hex.rs:49:18
+   |
+49 |         for i in 0..6 {
+   |                  ^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_range_loop
+   = note: `#[warn(clippy::needless_range_loop)]` on by default
+help: consider using an iterator
+   |
+49 |         for <item> in &DIR {
+   |             ~~~~~~    ~~~~
+
+warning: returning the result of a `let` binding from a block
+   --> src/core/hex.rs:158:9
+    |
+157 |         let res = mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin;
+    |         ------------------------------------------------------------------- unnecessary `let` binding
+158 |         res
+    |         ^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#let_and_return
+    = note: `#[warn(clippy::let_and_return)]` on by default
+help: return the expression directly
+    |
+157 ~         
+158 ~         mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin
+    |
+
+warning: the loop variable `dir` is used to index `DIR`
+   --> src/core/hex.rs:222:20
+    |
+222 |         for dir in 0..6 {
+    |                    ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+    |
+222 |         for (dir, <item>) in DIR.iter().enumerate() {
+    |             ~~~~~~~~~~~~~    ~~~~~~~~~~~~~~~~~~~~~~
+
+warning: usage of `contains_key` followed by `insert` on a `HashMap`
+  --> src/core/map.rs:31:28
+   |
+31 |                   let icur = if !idx.contains_key(&cur) {
+   |  ____________________________^
+32 | |                     let i = g.add_node(cur);
+33 | |                     idx.insert(cur, i);
+34 | |                     i
+35 | |                 } else {
+36 | |                     idx[&cur]
+37 | |                 };
+   | |_________________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#map_entry
+   = note: `#[warn(clippy::map_entry)]` on by default
+help: try
+   |
+31 ~                 let icur = if let std::collections::hash_map::Entry::Vacant(e) = idx.entry(cur) {
+32 +                     let i = g.add_node(cur);
+33 +                     e.insert(i);
+34 +                     i
+35 +                 } else {
+36 +                     idx[&cur]
+37 ~                 };
+   |
+
+warning: usage of `contains_key` followed by `insert` on a `HashMap`
+  --> src/core/map.rs:52:29
+   |
+52 |                   let inext = if !idx.contains_key(&next) {
+   |  _____________________________^
+53 | |                     let i = g.add_node(next);
+54 | |                     idx.insert(next, i);
+55 | |                     i
+56 | |                 } else {
+57 | |                     idx[&next]
+58 | |                 };
+   | |_________________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#map_entry
+help: try
+   |
+52 ~                 let inext = if let std::collections::hash_map::Entry::Vacant(e) = idx.entry(next) {
+53 +                     let i = g.add_node(next);
+54 +                     e.insert(i);
+55 +                     i
+56 +                 } else {
+57 +                     idx[&next]
+58 ~                 };
+   |
+
+warning: usage of `contains_key` followed by `insert` on a `HashMap`
+  --> src/core/map.rs:73:28
+   |
+73 |                   let icur = if !idx.contains_key(&cur) {
+   |  ____________________________^
+74 | |                     let i = g.add_node(cur);
+75 | |                     idx.insert(cur, i);
+76 | |                     i
+77 | |                 } else {
+78 | |                     idx[&cur]
+79 | |                 };
+   | |_________________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#map_entry
+help: try
+   |
+73 ~                 let icur = if let std::collections::hash_map::Entry::Vacant(e) = idx.entry(cur) {
+74 +                     let i = g.add_node(cur);
+75 +                     e.insert(i);
+76 +                     i
+77 +                 } else {
+78 +                     idx[&cur]
+79 ~                 };
+   |
+
+warning: usage of `contains_key` followed by `insert` on a `HashMap`
+  --> src/core/map.rs:87:33
+   |
+87 |                       let inext = if !idx.contains_key(&next) {
+   |  _________________________________^
+88 | |                         let i = g.add_node(next);
+89 | |                         idx.insert(next, i);
+90 | |                         i
+91 | |                     } else {
+92 | |                         idx[&next]
+93 | |                     };
+   | |_____________________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#map_entry
+help: try
+   |
+87 ~                     let inext = if let std::collections::hash_map::Entry::Vacant(e) = idx.entry(next) {
+88 +                         let i = g.add_node(next);
+89 +                         e.insert(i);
+90 +                         i
+91 +                     } else {
+92 +                         idx[&next]
+93 ~                     };
+   |
+
+warning: calls to `push` immediately after creation
+   --> src/core/map.rs:156:13
+    |
+156 | /             let mut vdir = Vec::new();
+157 | |             vdir.push(DIR[HexDirection::to_usize(HexDirection::SW)]);
+158 | |             vdir.push(DIR[HexDirection::to_usize(HexDirection::SE)]);
+159 | |             vdir.push(DIR[HexDirection::to_usize(HexDirection::E)]);
+160 | |             vdir.push(DIR[HexDirection::to_usize(HexDirection::W)]);
+    | |____________________________________________________________________^ help: consider using the `vec![]` macro: `let vdir = vec![..];`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#vec_init_then_push
+    = note: `#[warn(clippy::vec_init_then_push)]` on by default
+
+warning: the loop variable `i` is only used to index `DIR`
+   --> src/core/map.rs:177:18
+    |
+177 |         for i in 0..6 {
+    |                  ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_range_loop
+help: consider using an iterator
+    |
+177 |         for <item> in &DIR {
+    |             ~~~~~~    ~~~~
+
+warning: the loop variable `r` is used to index `arr`
+   --> src/core/map.rs:243:14
+    |
+243 |     for r in 0..9 {
+    |              ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_range_loop
+help: consider using an iterator and enumerate()
+    |
+243 |     for (r, <item>) in arr.iter().enumerate() {
+    |         ~~~~~~~~~~~    ~~~~~~~~~~~~~~~~~~~~~~
+
+warning: `hexorz` (bin "hexorz") generated 13 warnings (run `cargo clippy --fix --bin "hexorz"` to apply 6 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s

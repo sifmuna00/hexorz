@@ -1,12 +1,9 @@
-use ::core::f32;
-use macroquad::audio::{
-    load_sound, play_sound, play_sound_once, set_sound_volume, stop_sound, PlaySoundParams,
-};
+use macroquad::audio::{play_sound, play_sound_once, set_sound_volume, PlaySoundParams};
 use macroquad::prelude::*;
 
 mod core;
 
-use core::{game::*, hex::*, map::HexMap};
+use core::game::*;
 
 const HEXES_SIZE: f32 = 32.0;
 
@@ -34,7 +31,7 @@ async fn main() {
     let mut game = Game::init().await;
     let mut is_debug = false;
 
-    let mut direction_modifier: f32 = 0.0;
+    let direction_modifier: f32 = 0.0;
     let render_target = render_target(320, 150);
     render_target.texture.set_filter(FilterMode::Nearest);
     let material = load_material(

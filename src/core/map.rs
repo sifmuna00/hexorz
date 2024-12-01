@@ -5,10 +5,8 @@ use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 
-use crate::core::game::*;
+use crate::core::game::PlayerState;
 use crate::core::hex::*;
-
-use super::hex;
 
 pub struct HexMap {
     pub hexmap: HashMap<Hex, bool>,
@@ -148,8 +146,7 @@ impl HexMap {
 
     pub fn gen() -> Self {
         let mut hexmap = HashMap::new();
-        let mut start = Hex::from_axial(0, 0);
-        let mut goal = Hex::from_axial(1, 1);
+        let start = Hex::from_axial(0, 0);
 
         let mut last_hex = start;
 
@@ -173,7 +170,7 @@ impl HexMap {
             last_hex = next_hex;
             hexmap.insert(last_hex, true);
         }
-        goal = last_hex;
+        let goal = last_hex;
 
         hexmap.insert(start, true);
         hexmap.insert(goal, true);
