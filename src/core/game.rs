@@ -110,7 +110,6 @@ impl Game {
         };
 
         let game_map = HexMap::gen();
-        game_map.dump_map(5);
 
         Game {
             layout: pointy.clone(),
@@ -380,6 +379,9 @@ impl Game {
         );
 
         if is_debug {
+            println!("LV: {}", self.level_count);
+            self.map.dump_map(9);
+
             if let PlayerState::Standing(hex) = self.player_state {
                 self.draw_ans(hex);
             }
