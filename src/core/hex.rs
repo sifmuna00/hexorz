@@ -154,8 +154,8 @@ impl Layout {
         let size = self.size;
         let origin = self.origin;
 
-        let res = mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin;
-        res
+        
+        mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin
     }
 }
 
