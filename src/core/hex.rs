@@ -28,7 +28,7 @@ impl Hex {
         Hex::from_axial(q, r)
     }
 
-    pub const fn to_offset(&self) -> (i32, i32) {
+    pub const fn to_offset(self) -> (i32, i32) {
         let col = self.q + (self.r + (self.r & 1)) / 2;
         let row = self.r;
         (col, row)
@@ -154,7 +154,6 @@ impl Layout {
         let size = self.size;
         let origin = self.origin;
 
-        
         mat.f * vec2(hex.q as f32, hex.r as f32) * size + origin
     }
 }
