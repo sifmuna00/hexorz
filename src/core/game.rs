@@ -7,8 +7,6 @@ use crate::core::hex::*;
 use crate::core::map::*;
 use crate::HEXES_SIZE;
 
-const MAP_ZOOM: f32 = 2.0;
-
 #[derive(Debug, Clone, Copy, PartialEq, Hash, Eq)]
 pub enum PlayerState {
     Standing(Hex),
@@ -80,8 +78,10 @@ pub struct Game {
     flat_e_texture: Texture2D,
     pub sound_explosion: Sound,
     pub theme_music: Sound,
+    map_zoom: f32,
 }
 
+// const MAP_ZOOM: f32 = 2.0;
 impl Game {
     pub async fn init() -> Self {
         set_pc_assets_folder("assets");
@@ -124,6 +124,7 @@ impl Game {
             flat_e_texture,
             sound_explosion,
             theme_music,
+            map_zoom: 2.0,
         }
     }
 
@@ -154,6 +155,8 @@ impl Game {
                 self.update_map(HexMap::gen());
             }
         }
+
+        self.map_zoom = 2.0;
     }
 
     fn move_player(&mut self, direction: HexDirection) {
@@ -201,6 +204,12 @@ impl Game {
 
     pub fn update(&mut self) {
         if let Some(key) = get_last_key_pressed() {
+            let k = match key {
+                KeyCode::Up => self.map_zoom += 0.5,
+                KeyCode::Down => self.map_zoom -= 0.5,
+                _ => {}
+            };
+
             let dir: Option<HexDirection> = match key {
                 KeyCode::W => Some(HexDirection::NW),
                 KeyCode::E => Some(HexDirection::NE),
@@ -362,8 +371,8 @@ impl Game {
     pub fn draw(&self, is_debug: bool) {
         set_camera(&Camera2D {
             zoom: vec2(
-                MAP_ZOOM / screen_width() * 2.0,
-                MAP_ZOOM / screen_height() * 2.0,
+                self.map_zoom / screen_width() * 2.0,
+                self.map_zoom / screen_height() * 2.0,
             ),
             target: self.get_center(),
             ..Default::default()
