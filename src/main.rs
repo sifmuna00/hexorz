@@ -27,6 +27,8 @@ void main() {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    rand::srand(miniquad::date::now() as u64);
+
     let mut game_state = GameState::MainMenu;
     let mut game = Game::init().await;
     let mut is_debug = false;
@@ -58,8 +60,6 @@ async fn main() {
     );
 
     loop {
-        // clear_background(WHITE);
-
         clear_background(BLACK);
 
         material.set_uniform("iResolution", (screen_width(), screen_height()));
@@ -141,6 +141,11 @@ async fn main() {
                 );
             }
             GameState::GameWon => {
+                if is_debug {
+                    println!("LV: {}", game.level_count);
+                    game.map.dump_map(9);
+                }
+
                 if is_key_pressed(KeyCode::Space) {
                     game.update_level(true);
                     game_state = GameState::Playing;
